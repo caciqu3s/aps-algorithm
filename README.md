@@ -1,24 +1,4 @@
-# Análise Compar## 📋 Funcionalidades
-
-### Painel de Controle
-
-- ✅ Seleção múltipla de algoritmos
-- ✅ Configuração do tamanho da entrada (10 - 10.000 elementos)
-- ✅ Escolha do estado inicial dos dados
-- ✅ Opção de carregar dados de arquivo externo
-- ✅ **👁️ Visualização dos dados** - Novo botão para inspecionar os dados antes da análise
-- ✅ Validação de entrada e feedback de status
-
-### Área de Visualização
-
-- 📊 Gráfico de barras interativo com Chart.js
-- 📋 Tabela com resultados detalhados
-- 📊 **Painel de visualização de dados** com três modos:
-  - **Mostrar Todos**: Exibe todos os números da lista
-  - **Amostra (50)**: Mostra primeiros 25 e últimos 25 elementos
-  - **Estatísticas**: Análise completa dos dados (min, max, média, mediana, etc.)
-- ℹ️ Painel de informações do conjunto de dados
-- 🎯 Indicação de complexidade e tipo de algoritmopenho de Algoritmos de Ordenação
+# Análise Comparativa de Desempenho de Algoritmos de Ordenação
 
 Uma aplicação web interativa para comparar o desempenho dos algoritmos **Bubble Sort**, **Merge Sort** e **Quick Sort** com visualização em tempo real dos resultados.
 
@@ -37,15 +17,22 @@ Uma aplicação web interativa para comparar o desempenho dos algoritmos **Bubbl
 ## 📋 Funcionalidades
 
 ### Painel de Controle
+
 - ✅ Seleção múltipla de algoritmos
 - ✅ Configuração do tamanho da entrada (10 - 10.000 elementos)
 - ✅ Escolha do estado inicial dos dados
 - ✅ Opção de carregar dados de arquivo externo
+- ✅ **👁️ Visualização dos dados** - Novo botão para inspecionar os dados antes da análise
 - ✅ Validação de entrada e feedback de status
 
 ### Área de Visualização
-- 📊 Gráfico de barras animado com Chart.js
+
+- 📊 Gráfico de barras interativo com Chart.js
 - 📋 Tabela com resultados detalhados
+- 📊 **Painel de visualização de dados** com três modos:
+  - **Mostrar Todos**: Exibe todos os números da lista
+  - **Amostra (50)**: Mostra primeiros 25 e últimos 25 elementos
+  - **Estatísticas**: Análise completa dos dados (min, max, média, mediana, etc.)
 - ℹ️ Painel de informações do conjunto de dados
 - 🎯 Indicação de complexidade e tipo de algoritmo
 
@@ -76,41 +63,48 @@ http://localhost:8000
 
 1. **Selecione os Algoritmos**: Marque os algoritmos que deseja comparar
 2. **Configure o Tamanho**: Digite o número de elementos (10 - 10.000)
-3. **Escolha o Tipo de Dados**: 
+3. **Escolha o Tipo de Dados**:
    - **Aleatório**: Dados embaralhados
    - **Ordenado**: Melhor caso para algoritmos otimizados
    - **Inversamente Ordenado**: Pior caso para muitos algoritmos
    - **Quase Ordenado**: Cenário comum em aplicações reais
 4. **Fonte dos Dados**: Use geração interna ou carregue um arquivo
-5. **Execute**: Clique em "Executar Análise" e veja os resultados
+5. **👁️ Visualize os Dados**: (Opcional) Clique em "Visualizar Dados" para inspecionar os números
+6. **Execute**: Clique em "Executar Análise" e veja os resultados
 
 ### 3. Formato de Arquivo
 
 Para carregar dados externos, use arquivos de texto com números separados por:
+
 - Vírgulas: `1,2,3,4,5`
-- Quebras de linha: 
-  ```
+- Quebras de linha:
+
+  ```text
   1
   2
   3
   4
   5
   ```
+
 - Espaços: `1 2 3 4 5`
 
 ## 🔬 Detalhes dos Algoritmos
 
 ### Bubble Sort
+
 - **Complexidade**: O(n) melhor caso, O(n²) caso médio/pior
 - **Otimização**: Early-stopping quando não há trocas
 - **Tipo**: Algoritmo de comparação in-place
 
 ### Merge Sort
+
 - **Complexidade**: O(n log n) em todos os casos
 - **Tipo**: Dividir-para-conquistar, out-of-place
 - **Estabilidade**: Algoritmo estável
 
 ### Quick Sort
+
 - **Complexidade**: O(n log n) melhor/médio caso, O(n²) pior caso
 - **Pivô**: Último elemento do subarray
 - **Tipo**: Dividir-para-conquistar, in-place
@@ -120,6 +114,7 @@ Para carregar dados externos, use arquivos de texto com números separados por:
 - **Gráfico de Barras**: Visualização comparativa dos tempos de execução
 - **Tabela de Resultados**: Detalhes precisos com complexidade e tipo
 - **Informações do Dataset**: Tamanho, tipo e origem dos dados
+- **Visualização dos Dados**: Inspeção detalhada dos números e estatísticas
 
 ### Cenários Típicos
 
@@ -137,7 +132,7 @@ Para carregar dados externos, use arquivos de texto com números separados por:
 
 ## 📁 Estrutura do Projeto
 
-```
+```text
 aps-algorithm/
 ├── index.html          # Estrutura da interface
 ├── style.css           # Estilos e layout responsivo
@@ -149,16 +144,19 @@ aps-algorithm/
 ## 🔍 Considerações Técnicas
 
 ### Medição de Desempenho
+
 - Utiliza `performance.now()` para precisão de microssegundos
 - Evita interferência do garbage collector
 - Cria cópias independentes dos dados para cada algoritmo
 
 ### Otimizações
+
 - Bubble Sort com flag de early-stopping
 - Quick Sort com particionamento in-place
 - Merge Sort com arrays auxiliares otimizados
 
 ### Responsividade
+
 - Layout adaptável para diferentes tamanhos de tela
 - Gráficos redimensionáveis
 - Interface touch-friendly para dispositivos móveis
@@ -173,4 +171,4 @@ Projeto desenvolvido para fins educacionais e de pesquisa.
 
 ---
 
-**Desenvolvido com ❤️ para ensino e análise de algoritmos de ordenação**
+Desenvolvido com ❤️ para ensino e análise de algoritmos de ordenação
