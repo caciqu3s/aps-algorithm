@@ -27,11 +27,15 @@ const elements = {
     dataDisplay: null,
     showAllDataBtn: null,
     showSampleDataBtn: null,
-    showStatsDataBtn: null
+    showStatsDataBtn: null,
+    sortedDataPanel: null,
+    sortedAlgorithmsTabs: null,
+    sortedDataContent: null
 };
 
-// Variável global para armazenar os dados atuais
+// Variáveis globais para armazenar os dados
 let currentDataset = null;
+let sortedResults = {}; // Armazena os dados ordenados por cada algoritmo
 
 // ========================================
 // ALGORITMOS DE ORDENAÇÃO
@@ -344,6 +348,7 @@ async function runAnalysis() {
  */
 async function performAnalysis(algorithms, originalData) {
     const results = [];
+    sortedResults = {}; // Reset dos resultados ordenados
     
     for (const algorithm of algorithms) {
         // Cria cópia dos dados para cada algoritmo
@@ -352,24 +357,34 @@ async function performAnalysis(algorithms, originalData) {
         // Medição de tempo com performance.now()
         const t0 = performance.now();
         
-        // Executa algoritmo
+        // Executa algoritmo e armazena resultado
+        let sortedData;
         switch (algorithm.name) {
             case 'bubbleSort':
-                bubbleSort(dataCopy);
+                sortedData = bubbleSort(dataCopy);
                 break;
             case 'mergeSort':
-                mergeSort(dataCopy);
+                sortedData = mergeSort(dataCopy);
                 break;
             case 'quickSort':
-                quickSort(dataCopy);
+                sortedData = quickSort(dataCopy);
                 break;
         }
         
         const t1 = performance.now();
         const executionTime = t1 - t0;
         
+        // Armazena dados ordenados para visualização
+        sortedResults[algorithm.name] = {
+            data: sortedData,
+            algorithm: algorithm,
+            executionTime: executionTime,
+            originalSize: originalData.length
+        };
+        
         results.push({
             name: algorithm.label,
+            algorithmKey: algorithm.name,
             time: executionTime,
             complexity: algorithm.complexity,
             type: algorithm.type
@@ -504,6 +519,14 @@ function updateTable(results) {
         // Tipo
         const typeCell = row.insertCell();
         typeCell.textContent = result.type;
+        
+        // Botão para visualizar dados ordenados
+        const actionCell = row.insertCell();
+        const viewButton = document.createElement('button');
+        viewButton.className = 'view-sorted-btn';
+        viewButton.textContent = '👁️ Ver Ordenados';
+        viewButton.onclick = () => showSortedDataPanel(result.algorithmKey);
+        actionCell.appendChild(viewButton);
     });
 }
 
@@ -845,6 +868,162 @@ function setActiveDataControl(activeId) {
 }
 
 // ========================================
+// VISUALIZAÇÃO DOS DADOS ORDENADOS
+// ========================================
+
+/**
+ * Mostra painel de dados ordenados e inicializa com algoritmo específico
+ */
+function showSortedDataPanel(algorithmKey = null) {
+    // Mostra o painel
+    elements.sortedDataPanel.style.display = 'block';
+    
+    // Cria tabs dos algoritmos
+    createAlgorithmTabs();
+    
+    // Se um algoritmo específico foi solicitado, mostra ele
+    if (algorithmKey && sortedResults[algorithmKey]) {
+        showSortedData(algorithmKey);
+    } else {
+        // Senão, mostra o primeiro algoritmo disponível
+        const firstAlgorithm = Object.keys(sortedResults)[0];
+        if (firstAlgorithm) {
+            showSortedData(firstAlgorithm);
+        }
+    }
+    
+    // Rola até o painel
+    elements.sortedDataPanel.scrollIntoView({ behavior: 'smooth' });
+}
+
+/**
+ * Cria tabs para seleção de algoritmos
+ */
+function createAlgorithmTabs() {
+    const tabsContainer = elements.sortedAlgorithmsTabs;
+    tabsContainer.innerHTML = '';
+    
+    Object.keys(sortedResults).forEach(algorithmKey => {
+        const result = sortedResults[algorithmKey];
+        const tab = document.createElement('div');
+        tab.className = 'algorithm-tab';
+        tab.onclick = () => showSortedData(algorithmKey);
+        
+        tab.innerHTML = `
+            <span>${result.algorithm.label}</span>
+            <span class="algorithm-status">${formatTime(result.executionTime)}</span>
+        `;
+        
+        tabsContainer.appendChild(tab);
+    });
+}
+
+/**
+ * Exibe dados ordenados de um algoritmo específico
+ */
+function showSortedData(algorithmKey) {
+    const result = sortedResults[algorithmKey];
+    if (!result) return;
+    
+    // Atualiza tabs ativos
+    document.querySelectorAll('.algorithm-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Marca tab ativo
+    const tabs = document.querySelectorAll('.algorithm-tab');
+    const algorithmIndex = Object.keys(sortedResults).indexOf(algorithmKey);
+    if (tabs[algorithmIndex]) {
+        tabs[algorithmIndex].classList.add('active');
+    }
+    
+    // Calcula estatísticas dos dados ordenados
+    const sortedStats = calculateSortedDataStatistics(result.data, currentDataset);
+    
+    // Atualiza conteúdo
+    elements.sortedDataContent.innerHTML = `
+        <div class="sorted-data-header">
+            <h4>${result.algorithm.label} - Dados Ordenados</h4>
+        </div>
+        
+        <div class="sorted-data-info">
+            <div class="sorted-info-item">
+                <div class="sorted-info-label">Tempo de Execução</div>
+                <div class="sorted-info-value">${formatTime(result.executionTime)}</div>
+            </div>
+            <div class="sorted-info-item">
+                <div class="sorted-info-label">Elementos</div>
+                <div class="sorted-info-value">${result.data.length.toLocaleString()}</div>
+            </div>
+            <div class="sorted-info-item">
+                <div class="sorted-info-label">Corretamente Ordenado</div>
+                <div class="sorted-info-value">${sortedStats.isCorrectlySorted ? '✅ Sim' : '❌ Não'}</div>
+            </div>
+            <div class="sorted-info-item">
+                <div class="sorted-info-label">Trocas Necessárias</div>
+                <div class="sorted-info-value">${sortedStats.swapsNeeded}</div>
+            </div>
+        </div>
+        
+        <div class="sorted-data-display">
+            ${formatSortedDataForDisplay(result.data)}
+        </div>
+    `;
+}
+
+/**
+ * Calcula estatísticas dos dados ordenados
+ */
+function calculateSortedDataStatistics(sortedData, originalData) {
+    // Verifica se está corretamente ordenado
+    let isCorrectlySorted = true;
+    for (let i = 1; i < sortedData.length; i++) {
+        if (sortedData[i] < sortedData[i-1]) {
+            isCorrectlySorted = false;
+            break;
+        }
+    }
+    
+    // Calcula número de elementos fora de lugar (aproximação simples)
+    let swapsNeeded = 0;
+    const originalSorted = [...originalData].sort((a, b) => a - b);
+    
+    for (let i = 0; i < sortedData.length; i++) {
+        if (sortedData[i] !== originalSorted[i]) {
+            swapsNeeded++;
+        }
+    }
+    
+    return {
+        isCorrectlySorted,
+        swapsNeeded: swapsNeeded === 0 ? 0 : Math.floor(swapsNeeded / 2) // Divisão por 2 pois cada troca afeta 2 elementos
+    };
+}
+
+/**
+ * Formata dados ordenados para exibição
+ */
+function formatSortedDataForDisplay(data) {
+    if (data.length <= 100) {
+        // Para arrays pequenos, mostra todos
+        return `<strong>Dados completos (${data.length} elementos):</strong><br><br>[${data.join(', ')}]`;
+    } else {
+        // Para arrays grandes, mostra amostra
+        const beginning = data.slice(0, 30);
+        const end = data.slice(-30);
+        
+        return `
+            <strong>Amostra dos dados ordenados (${data.length} elementos):</strong><br><br>
+            <strong>Primeiros 30:</strong><br>
+            [${beginning.join(', ')}]<br><br>
+            <strong>... (${data.length - 60} elementos omitidos) ...</strong><br><br>
+            <strong>Últimos 30:</strong><br>
+            [${end.join(', ')}]
+        `;
+    }
+}
+
+// ========================================
 // EVENT LISTENERS E INICIALIZAÇÃO
 // ========================================
 
@@ -874,6 +1053,9 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.showAllDataBtn = document.getElementById('show-all-data');
     elements.showSampleDataBtn = document.getElementById('show-sample-data');
     elements.showStatsDataBtn = document.getElementById('show-stats-data');
+    elements.sortedDataPanel = document.getElementById('sorted-data-panel');
+    elements.sortedAlgorithmsTabs = document.getElementById('sorted-algorithms-tabs');
+    elements.sortedDataContent = document.getElementById('sorted-data-content');
     
     // Event listeners para botões principais
     elements.runButton.addEventListener('click', runAnalysis);
@@ -890,19 +1072,25 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleFileUpload();
             // Reset dos dados carregados quando mudar a fonte
             currentDataset = null;
+            sortedResults = {};
             elements.dataPreviewPanel.style.display = 'none';
+            elements.sortedDataPanel.style.display = 'none';
         });
     });
     
     // Event listener para mudanças nos parâmetros (reset dos dados)
     elements.inputSize.addEventListener('change', () => {
         currentDataset = null;
+        sortedResults = {};
         elements.dataPreviewPanel.style.display = 'none';
+        elements.sortedDataPanel.style.display = 'none';
     });
     
     elements.dataType.addEventListener('change', () => {
         currentDataset = null;
+        sortedResults = {};
         elements.dataPreviewPanel.style.display = 'none';
+        elements.sortedDataPanel.style.display = 'none';
     });
     
     // Inicializa estado da interface

@@ -28,11 +28,16 @@ Uma aplicação web interativa para comparar o desempenho dos algoritmos **Bubbl
 ### Área de Visualização
 
 - 📊 Gráfico de barras interativo com Chart.js
-- 📋 Tabela com resultados detalhados
+- 📋 Tabela com resultados detalhados e botões de ação
 - 📊 **Painel de visualização de dados** com três modos:
   - **Mostrar Todos**: Exibe todos os números da lista
   - **Amostra (50)**: Mostra primeiros 25 e últimos 25 elementos
   - **Estatísticas**: Análise completa dos dados (min, max, média, mediana, etc.)
+- 🔍 **Visualização dos dados ordenados** - Nova funcionalidade!
+  - **Tabs por algoritmo**: Navegação entre resultados de cada algoritmo
+  - **Dados ordenados**: Visualização dos números após a ordenação
+  - **Verificação de correção**: Confirma se a ordenação foi bem-sucedida
+  - **Estatísticas de ordenação**: Informações sobre o processo de ordenação
 - ℹ️ Painel de informações do conjunto de dados
 - 🎯 Indicação de complexidade e tipo de algoritmo
 
@@ -71,6 +76,7 @@ http://localhost:8000
 4. **Fonte dos Dados**: Use geração interna ou carregue um arquivo
 5. **👁️ Visualize os Dados**: (Opcional) Clique em "Visualizar Dados" para inspecionar os números
 6. **Execute**: Clique em "Executar Análise" e veja os resultados
+7. **🔍 Explore os Resultados Ordenados**: Clique em "Ver Ordenados" na tabela para visualizar como cada algoritmo organizou os dados
 
 ### 3. Formato de Arquivo
 
